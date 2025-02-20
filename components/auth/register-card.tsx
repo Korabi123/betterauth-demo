@@ -21,9 +21,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { GithubIcon, Loader } from "lucide-react";
+import { Eye, EyeOff, GithubIcon, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ErrorCard } from "./error-card";
+import { AFTER_REGISTER } from "@/routes";
 
 const formSchema = z.object({
   name: z.string().min(4),
@@ -38,8 +39,11 @@ export const RegisterCard = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const router = useRouter();
+
+  const toggleVisibility = () => setIsPasswordVisible((prevState) => !prevState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,7 +65,7 @@ export const RegisterCard = ({
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/success");
+        router.push(AFTER_REGISTER);
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -73,13 +77,14 @@ export const RegisterCard = ({
   const onGithub = async () => {
     authClient.signIn.social({
       provider: "github",
+      callbackURL: "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/success");
+        // router.push(AFTER_REGISTER);
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -91,13 +96,14 @@ export const RegisterCard = ({
   const onGoogle = async () => {
     authClient.signIn.social({
       provider: "google",
+      callbackURL: "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/success");
+        // router.push(AFTER_REGISTER);
       },
       onError: (ctx) => {
         setIsLoading(false);
@@ -163,7 +169,6 @@ export const RegisterCard = ({
                 <FormControl>
                   <Input
                     disabled={isLoading}
-                    placeholder="Your name"
                     {...field}
                   />
                 </FormControl>
@@ -181,7 +186,6 @@ export const RegisterCard = ({
                   <Input
                     type="email"
                     disabled={isLoading}
-                    placeholder="Your email"
                     {...field}
                   />
                 </FormControl>
@@ -196,12 +200,32 @@ export const RegisterCard = ({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    disabled={isLoading}
-                    placeholder="********"
-                    {...field}
-                  />
+                <div className="relative">
+                    <Input
+                      {...field}
+                      autoCorrect="off"
+                      autoComplete="off"
+                      disabled={isLoading}
+                      type={isPasswordVisible ? "text" : "password"}
+                      className="pe-9"
+                    />
+                    <button
+                      className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                      type="button"
+                      onClick={toggleVisibility}
+                      aria-label={
+                        isPasswordVisible ? "Hide password" : "Show password"
+                      }
+                      aria-pressed={isPasswordVisible}
+                      aria-controls="password"
+                    >
+                      {isPasswordVisible ? (
+                        <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
+                      ) : (
+                        <Eye size={16} strokeWidth={2} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

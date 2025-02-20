@@ -1,9 +1,15 @@
 import { LoginCard } from "@/components/auth/login-card";
+import { headers } from "next/headers";
 
-const LoginPage = () => {
+const LoginPage = async () => {
+  const header = await headers();
+  const ip = header.get("x-real-ip");
+
+  console.log(ip);
+
   return (
     <div className="h-[100vh] z-50 w-full flex flex-col items-center justify-center">
-      <LoginCard />
+      <LoginCard ip={ip!} />
     </div>
   );
 }

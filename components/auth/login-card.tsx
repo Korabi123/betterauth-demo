@@ -21,9 +21,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { GithubIcon, Loader } from "lucide-react";
+import { Eye, EyeOff, GithubIcon, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ErrorCard } from "./error-card";
+import { AFTER_LOGIN } from "@/routes";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -32,13 +33,20 @@ const formSchema = z.object({
 
 export const LoginCard = ({
   showSocial = true,
+  ip,
 }: {
   showSocial?: boolean;
+  ip?: string;
 }) => {
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailState, setEmailState] = useState("");
 
   const router = useRouter();
+
+  const toggleVisibility = () => setIsPasswordVisible((prevState) => !prevState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +57,9 @@ export const LoginCard = ({
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setEmailState(form.getValues().email);
+    console.log(emailState);
+
     authClient.signIn.email({
       email: data.email,
       password: data.password,
@@ -56,9 +67,21 @@ export const LoginCard = ({
       onRequest: () => {
         setIsLoading(true);
       },
-      onSuccess: () => {
+      onSuccess: async () => {
         setIsLoading(false);
-        router.push("/success");
+        await fetch("/api/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            "email": "korabimeri91@gmail.com",
+            "ip": "185.222.138.134",
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "name": "korabimeri91@gmail.com",
+          }),
+        });
+        router.push(AFTER_LOGIN);
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -70,13 +93,15 @@ export const LoginCard = ({
   const onGithub = async () => {
     authClient.signIn.social({
       provider: "github",
+      callbackURL: "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/success");
+        // router.push(AFTER_LOGIN);
+
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -88,13 +113,14 @@ export const LoginCard = ({
   const onGoogle = async () => {
     authClient.signIn.social({
       provider: "google",
+      callbackURL: "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/success");
+        // router.push(AFTER_LOGIN);
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -161,7 +187,6 @@ export const LoginCard = ({
                   <Input
                     type="email"
                     disabled={isLoading}
-                    placeholder="Your email"
                     {...field}
                   />
                 </FormControl>
@@ -176,12 +201,32 @@ export const LoginCard = ({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    disabled={isLoading}
-                    placeholder="********"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      autoCorrect="off"
+                      autoComplete="off"
+                      disabled={isLoading}
+                      type={isPasswordVisible ? "text" : "password"}
+                      className="pe-9"
+                    />
+                    <button
+                      className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                      type="button"
+                      onClick={toggleVisibility}
+                      aria-label={
+                        isPasswordVisible ? "Hide password" : "Show password"
+                      }
+                      aria-pressed={isPasswordVisible}
+                      aria-controls="password"
+                    >
+                      {isPasswordVisible ? (
+                        <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
+                      ) : (
+                        <Eye size={16} strokeWidth={2} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
