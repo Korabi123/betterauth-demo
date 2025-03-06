@@ -5,6 +5,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
+import { twoFactor } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -46,4 +48,25 @@ export const auth = betterAuth({
       });
     }
   },
+  appName: "APP_NAME",
+  plugins: [
+    twoFactor({
+      issuer: "APP_NAME",
+      otpOptions: {
+        async sendOTP({ user, otp }, request) {
+          await resend.emails.send({
+            to: user.email,
+            from: 'no-reply@korabimeri.work.gd',
+            subject: 'Your Login Verification Code',
+            text: `Your login verification code is: ${otp}`,
+          });
+        }
+      }
+    }),
+    passkey({
+      rpID: "localhost",
+      rpName: "BetterAuth Demo",
+      origin: "http://localhost:3000",
+    })
+  ],
 });

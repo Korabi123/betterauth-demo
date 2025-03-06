@@ -1,8 +1,6 @@
-// import { UserButton } from "@/components/auth/user-button";
 "use client";
 
 import { UserButton } from "@/components/auth/user-button";
-import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 
@@ -16,12 +14,11 @@ const ProfilePage = () => {
         <Link href="/login">
           <p>Login</p>
         </Link>
-        <Button onClick={() => authClient.signOut()}>
-          Logout
-        </Button>
       </>
     );
   }
+
+  data?.user.twoFactorEnabled
 
   console.log(data?.user.name);
 
@@ -29,7 +26,7 @@ const ProfilePage = () => {
     // <div>
     //   <span>{data?.user.name}</span>
     // </div>
-    <UserButton user={data?.user} />
+    <UserButton user={data?.user} session={data?.session} />
   );
 }
 
