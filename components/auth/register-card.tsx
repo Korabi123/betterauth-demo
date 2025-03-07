@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, GithubIcon, Loader } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ErrorCard } from "./error-card";
-import { AFTER_REGISTER } from "@/routes";
+import { AFTER_LOGIN, AFTER_REGISTER } from "@/routes";
 
 const formSchema = z.object({
   name: z.string().min(4),
@@ -40,6 +40,8 @@ export const RegisterCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const params = useSearchParams();
+  const redirectParam = params.get("redirect");
 
   const router = useRouter();
 
@@ -65,7 +67,11 @@ export const RegisterCard = ({
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push(AFTER_REGISTER);
+        if (redirectParam) {
+          router.push(new URL(redirectParam).pathname);
+        } else {
+          router.push(AFTER_LOGIN);
+        }
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -77,14 +83,13 @@ export const RegisterCard = ({
   const onGithub = async () => {
     authClient.signIn.social({
       provider: "github",
-      callbackURL: "/profile"
+      callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        // router.push(AFTER_REGISTER);
       },
       onError: (ctx) => {
         setError(ctx.error.message);
@@ -96,14 +101,13 @@ export const RegisterCard = ({
   const onGoogle = async () => {
     authClient.signIn.social({
       provider: "google",
-      callbackURL: "/profile"
+      callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile"
     }, {
       onRequest: () => {
         setIsLoading(true);
       },
       onSuccess: () => {
         setIsLoading(false);
-        // router.push(AFTER_REGISTER);
       },
       onError: (ctx) => {
         setIsLoading(false);
@@ -116,7 +120,8 @@ export const RegisterCard = ({
     <CardWrapper
       title="Sign up to Acme co"
       description="Welcome! Please sign up to continue."
-      footerRef="login"
+      footerRef={redirectParam ? "loginWithRedirect" : "login"}
+      param={redirectParam!}
     >
       {showSocial && (
         <>

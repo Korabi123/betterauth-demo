@@ -145,8 +145,8 @@ export const UserButton = ({
   const [isRemoveTwoFactorBoxOpen, setIsRemoveTwoFactorBoxOpen] =
     useState(false);
   const [connections, setConnections] = useState<Account[]>([]);
-  const [isRenamePasskeyBoxOpen, setIsRenamePasskeyBoxOpen] = useState(false);
-  const [isDeletePasskeyBoxOpen, setIsDeletePasskeyBoxOpen] = useState(false);
+  const [isRenamePasskeyBoxOpen, setIsRenamePasskeyBoxOpen] = useState<string | boolean>(false);
+  const [isDeletePasskeyBoxOpen, setIsDeletePasskeyBoxOpen] = useState<string | boolean>(false);
   const [isDeleteConnectionBoxOpen, setIsDeleteConnectionBoxOpen] =
     useState<"google" | "github" | "closed">("closed");
   const [twoFactorStage, setTwoFactorStage] = useState(1);
@@ -460,7 +460,13 @@ export const UserButton = ({
           </DialogTrigger>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => authClient.signOut()}
+            onClick={() => {
+              authClient.signOut({}, {
+                onSuccess: () => {
+                  router.refresh();
+                }
+              });
+            }}
             className="p-3.5 font-medium text-black/70 cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
@@ -1334,7 +1340,7 @@ export const UserButton = ({
                                     <DropdownMenuItem
                                       className="cursor-pointer px-3 py-1 text-zinc-600 focus:text-zinc-800 transition-all"
                                       onClick={() => {
-                                        setIsRenamePasskeyBoxOpen(true);
+                                        setIsRenamePasskeyBoxOpen(passkey.id);
                                       }}
                                     >
                                       <p className="text-sm">Rename</p>
@@ -1342,7 +1348,7 @@ export const UserButton = ({
                                     <DropdownMenuItem
                                       className="cursor-pointer px-3 py-1 text-destructive/80 focus:text-red-500 focus:bg-destructive/5"
                                       onClick={() =>
-                                        setIsDeletePasskeyBoxOpen(true)
+                                        setIsDeletePasskeyBoxOpen(passkey.id)
                                       }
                                     >
                                       <p className="text-sm">Remove</p>
@@ -1350,8 +1356,14 @@ export const UserButton = ({
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              {isRenamePasskeyBoxOpen && (
-                                <Card className="shadow-md w-full md:max-w-[350px]">
+                              {isRenamePasskeyBoxOpen !== false && (
+                                <Card
+                                  className={cn(
+                                    "shadow-md w-full md:max-w-[350px]",
+                                    isRenamePasskeyBoxOpen !== passkey.id &&
+                                      "hidden"
+                                  )}
+                                >
                                   <CardHeader className="w-full flex flex-col">
                                     <CardTitle className="text-sm tracking-tight">
                                       Rename Passkey
@@ -1422,8 +1434,14 @@ export const UserButton = ({
                                   </CardContent>
                                 </Card>
                               )}
-                              {isDeletePasskeyBoxOpen && (
-                                <Card className="shadow-md w-full bg-muted-foreground/5 border-zinc-600/15 md:max-w-[350px]">
+                              {isDeletePasskeyBoxOpen !== false && (
+                                <Card
+                                  className={cn(
+                                    "shadow-md w-full bg-muted-foreground/5 border-zinc-600/15 md:max-w-[350px]",
+                                    isDeletePasskeyBoxOpen !== passkey.id &&
+                                      "hidden"
+                                  )}
+                                >
                                   <CardHeader className="w-full flex flex-col">
                                     <CardTitle className="text-sm tracking-tight">
                                       Delete Passkey
@@ -1496,7 +1514,8 @@ export const UserButton = ({
                     <Button
                       variant={"ghost"}
                       size="sm"
-                      className="text-sm self-start -ml-3 -mt-[4px]"
+                      // @ts-expect-error Just a simple type error
+                      className={cn("text-sm self-start -mt-[4px]", passkeys.data?.length > 0 ? "-ml-3" : "ml-auto")}
                       onClick={onAddPasskey}
                     >
                       Add passkey
@@ -1684,7 +1703,7 @@ export const UserButton = ({
                         <Button
                           variant={"ghost"}
                           size="sm"
-                          className="text-sm self-start -ml-3 -mt-[4px]"
+                          className={cn("text-sm self-start -mt-[4px]", connections.length > 0 ? "-ml-3" : "ml-auto")}
                         >
                           Add connection
                         </Button>

@@ -18,13 +18,15 @@ export const CardWrapper = ({
   hasLogo = false,
   logoSrc,
   footerRef,
+  param,
 }: {
   children: React.ReactNode;
   title: string;
   description: string;
   hasLogo?: boolean;
   logoSrc?: string;
-  footerRef?: "login" | "register";
+  footerRef?: "login" | "register" | "registerWithRedirect" | "loginWithRedirect";
+  param?: string;
 }) => {
   return (
     <Card className="md:w-[400px] w-full">
@@ -51,6 +53,26 @@ export const CardWrapper = ({
             <Link href="/sign-up">
               <span className="text-blue-500 hover:text-blue-600 hover:underline transition-all">
                 Sign up
+              </span>
+            </Link>
+          </span>
+        )}
+        {footerRef === "registerWithRedirect" && (
+          <span className="text-muted-foreground/70 text-sm">
+            Don&apos;t have an account?{" "}
+            <Link href={`/sign-up?redirect=${encodeURIComponent(param!)}`}>
+              <span className="text-blue-500 hover:text-blue-600 hover:underline transition-all">
+                Sign up
+              </span>
+            </Link>
+          </span>
+        )}
+        {footerRef === "loginWithRedirect" && (
+          <span className="text-muted-foreground/70 text-sm">
+            Already have an account?{" "}
+            <Link href={`/login?redirect=${encodeURIComponent(param!)}`}>
+              <span className="text-blue-500 hover:text-blue-600 hover:underline transition-all">
+                Sign in
               </span>
             </Link>
           </span>

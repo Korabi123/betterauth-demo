@@ -32,6 +32,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "../ui/input-otp";
+import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -58,6 +59,8 @@ export const LoginCard = ({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [emailState, setEmailState] = useState("");
   const [isVerifyOtpBoxOpen, setIsVerifyOtpBoxOpen] = useState(false);
+  const params = useSearchParams();
+  const redirectParam = params.get("redirect");
 
   const router = useRouter();
 
@@ -99,7 +102,11 @@ export const LoginCard = ({
             setIsLoading(false);
           } else {
             setIsLoading(false);
-            router.push(AFTER_LOGIN);
+            if (redirectParam) {
+              router.push(new URL(redirectParam).pathname);
+            } else {
+              router.push(AFTER_LOGIN);
+            }
           }
         },
         onError: (ctx) => {
@@ -114,7 +121,7 @@ export const LoginCard = ({
     authClient.signIn.social(
       {
         provider: "github",
-        callbackURL: "/profile",
+        callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile",
       },
       {
         onRequest: () => {
@@ -122,7 +129,6 @@ export const LoginCard = ({
         },
         onSuccess: () => {
           setIsLoading(false);
-          // router.push(AFTER_LOGIN);
         },
         onError: (ctx) => {
           setError(ctx.error.message);
@@ -136,7 +142,7 @@ export const LoginCard = ({
     authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: "/profile",
+        callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile",
       },
       {
         onRequest: () => {
@@ -144,7 +150,6 @@ export const LoginCard = ({
         },
         onSuccess: () => {
           setIsLoading(false);
-          // router.push(AFTER_LOGIN);
         },
         onError: (ctx) => {
           setError(ctx.error.message);
@@ -165,7 +170,11 @@ export const LoginCard = ({
         },
         onSuccess: async () => {
           setIsLoading(false);
-          router.push(AFTER_LOGIN);
+          if (redirectParam) {
+            router.push(new URL(redirectParam).pathname);
+          } else {
+            router.push(AFTER_LOGIN);
+          }
         },
         onError: (ctx) => {
           setError(ctx.error.message);
@@ -184,7 +193,11 @@ export const LoginCard = ({
         },
         onSuccess: async () => {
           setIsLoading(false);
-          router.push(AFTER_LOGIN);
+          if (redirectParam) {
+            router.push(new URL(redirectParam).pathname);
+          } else {
+            router.push(AFTER_LOGIN);
+          }
         },
         onError: (ctx) => {
           setError(ctx.error.message);
@@ -198,7 +211,8 @@ export const LoginCard = ({
     <CardWrapper
       title="Sign In to Acme co"
       description="Welcome back! Please sign in to continue."
-      footerRef="register"
+      footerRef={redirectParam ? "registerWithRedirect" : "register"}
+      param={redirectParam!}
     >
       {!isVerifyOtpBoxOpen ? (
         <>

@@ -6,7 +6,6 @@ import Link from "next/link";
 
 const ProfilePage = () => {
   const { data } = authClient.useSession();
-  // const blabla = session.data
 
   if (!data) {
     return (
@@ -23,9 +22,7 @@ const ProfilePage = () => {
   console.log(data?.user.name);
 
   return (
-    // <div>
-    //   <span>{data?.user.name}</span>
-    // </div>
+    // @ts-expect-error Just a simple type error
     <UserButton user={data?.user} session={data?.session} />
   );
 }
