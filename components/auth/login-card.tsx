@@ -1,6 +1,6 @@
 "use client";
 
-import { FaGoogle } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -33,6 +33,9 @@ import {
   InputOTPSlot,
 } from "../ui/input-otp";
 import { useSearchParams } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
+
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -121,7 +124,9 @@ export const LoginCard = ({
     authClient.signIn.social(
       {
         provider: "github",
-        callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile",
+        callbackURL: redirectParam
+          ? new URL(redirectParam).pathname
+          : "/profile",
       },
       {
         onRequest: () => {
@@ -142,7 +147,9 @@ export const LoginCard = ({
     authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: redirectParam ? new URL(redirectParam).pathname : "/profile",
+        callbackURL: redirectParam
+          ? new URL(redirectParam).pathname
+          : "/profile",
       },
       {
         onRequest: () => {
@@ -207,40 +214,41 @@ export const LoginCard = ({
     );
   };
 
+  const [animateRef] = useAutoAnimate();
+
   return (
     <CardWrapper
       title="Sign In to Acme co"
       description="Welcome back! Please sign in to continue."
       footerRef={redirectParam ? "registerWithRedirect" : "register"}
       param={redirectParam!}
+      ref={animateRef}
     >
       {!isVerifyOtpBoxOpen ? (
         <>
           {showSocial && (
             <>
-              <div className="flex items-center gap-2">
+              <div ref={animateRef} className="flex items-center gap-2">
                 <Button
                   disabled={isLoading}
                   onClick={onGithub}
                   variant={"outline"}
-                  className="w-full shadow-sm border-[1.5px]"
+                  className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
                   type="button"
+                  size={"sm"}
                 >
-                  <span>
-                    <GithubIcon />
-                  </span>
+                  <FaGithub className="text-black text-lg" />
                   Github
                 </Button>
                 <Button
                   disabled={isLoading}
                   onClick={onGoogle}
                   variant={"outline"}
-                  className="w-full shadow-sm border-[1.5px]"
+                  className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
                   type="button"
+                  size={"sm"}
                 >
-                  <span>
-                    <FaGoogle />
-                  </span>
+                  <FcGoogle className="text-lg" />
                   Google
                 </Button>
               </div>
@@ -251,7 +259,7 @@ export const LoginCard = ({
               </div>
             </>
           )}
-          {error && <ErrorCard error={error} />}
+          <div ref={animateRef}>{error && <ErrorCard error={error} />}</div>
           <Form {...form}>
             <form
               autoComplete="off"
@@ -315,18 +323,38 @@ export const LoginCard = ({
                   </FormItem>
                 )}
               />
-              <Button disabled={isLoading} className="w-full" type="submit">
+              <Button
+                effect={"ringHover"}
+                size="sm"
+                disabled={isLoading}
+                className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
+                type="submit"
+                ref={animateRef}
+              >
                 {isLoading && (
-                  <Loader className="animate-spin text-muted-foreground size-4 mr-3" />
+                  <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
                 )}
-                Sign In
+                {!isLoading && "Sign In"}
+                {!isLoading && (
+                  <svg className="mt-2 text-white/50 -ml-1">
+                    <path
+                      fill="currentColor"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
+                    ></path>
+                  </svg>
+                )}
               </Button>
               <Button
                 type="button"
                 size={"sm"}
-                variant={"ghost"}
-                className="mt-2 text-sm self-center hover:bg-white text-blue-500 hover:text-blue-600 hover:underline focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
+                variant={"link"}
+                className="mt-2 text-sm self-center text-blue-500 after:bg-blue-600 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
                 onClick={onPasskeyLogin}
+                effect={"hoverUnderline"}
               >
                 Use passkey instead
               </Button>
@@ -349,7 +377,7 @@ export const LoginCard = ({
                           <InputOTPSlot index={0} />
                           <InputOTPSlot index={1} />
                           <InputOTPSlot index={2} />
-                          <InputOTPSeparator className="mx-1 text-zinc-600" />
+                          <InputOTPSeparator className="mx-1 text-blue-500" />
                           <InputOTPSlot index={3} />
                           <InputOTPSlot index={4} />
                           <InputOTPSlot index={5} />
@@ -364,18 +392,32 @@ export const LoginCard = ({
                 )}
               />
               <Button
-                size={"sm"}
-                type="button"
+                effect={"ringHover"}
+                size="sm"
                 disabled={isLoading}
-                className="mt-4 w-full"
+                className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
+                type="button"
+                ref={animateRef}
                 onClick={() => {
                   onVerifyOtpSubmit({ otp: verifyForm.getValues().otp });
                 }}
               >
                 {isLoading && (
-                  <Loader className="mr-1 size-2 text-muted-foreground animate-spin" />
+                  <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
                 )}
-                Continue
+                {!isLoading && "Sign In"}
+                {!isLoading && (
+                  <svg className="mt-2 text-white/50 -ml-1">
+                    <path
+                      fill="currentColor"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
+                    ></path>
+                  </svg>
+                )}
               </Button>
             </form>
           </Form>

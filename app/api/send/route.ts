@@ -8,8 +8,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
-    const { body } = await req.json();
-    const { email, ip, userAgent, name } = body;
+    const { email, ip, userAgent, name } = await req.json();
 
     if (!email || !ip || !userAgent || !name) {
       return new NextResponse("Invalid request", { status: 400 });

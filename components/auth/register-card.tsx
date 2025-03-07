@@ -1,6 +1,8 @@
 "use client";
 
-import { FaGoogle } from "react-icons/fa";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+
+import { FaGithub } from "react-icons/fa";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -25,6 +27,7 @@ import { Eye, EyeOff, GithubIcon, Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ErrorCard } from "./error-card";
 import { AFTER_LOGIN, AFTER_REGISTER } from "@/routes";
+import { FcGoogle } from "react-icons/fc";
 
 const formSchema = z.object({
   name: z.string().min(4),
@@ -46,6 +49,8 @@ export const RegisterCard = ({
   const router = useRouter();
 
   const toggleVisibility = () => setIsPasswordVisible((prevState) => !prevState);
+
+  const [animateRef] = useAutoAnimate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,6 +127,7 @@ export const RegisterCard = ({
       description="Welcome! Please sign up to continue."
       footerRef={redirectParam ? "loginWithRedirect" : "login"}
       param={redirectParam!}
+      ref={animateRef}
     >
       {showSocial && (
         <>
@@ -130,11 +136,12 @@ export const RegisterCard = ({
               disabled={isLoading}
               onClick={onGithub}
               variant={"outline"}
-              className="w-full shadow-sm border-[1.5px]"
+              className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
               type="button"
+              size="sm"
             >
               <span>
-                <GithubIcon />
+                <FaGithub className="text-black text-lg" />
               </span>
               Github
             </Button>
@@ -142,11 +149,12 @@ export const RegisterCard = ({
               disabled={isLoading}
               onClick={onGoogle}
               variant={"outline"}
-              className="w-full shadow-sm border-[1.5px]"
+              className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
               type="button"
+              size="sm"
             >
               <span>
-                <FaGoogle />
+                <FcGoogle />
               </span>
               Google
             </Button>
@@ -158,12 +166,13 @@ export const RegisterCard = ({
           </div>
         </>
       )}
-      {error && <ErrorCard error={error} />}
+      <div ref={animateRef}>{error && <ErrorCard error={error} />}</div>
       <Form {...form}>
         <form
           autoComplete="off"
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8"
+          ref={animateRef}
         >
           <FormField
             control={form.control}
@@ -172,10 +181,7 @@ export const RegisterCard = ({
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    {...field}
-                  />
+                  <Input disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -188,11 +194,7 @@ export const RegisterCard = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    disabled={isLoading}
-                    {...field}
-                  />
+                  <Input type="email" disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -205,7 +207,7 @@ export const RegisterCard = ({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                <div className="relative">
+                  <div className="relative">
                     <Input
                       {...field}
                       autoCorrect="off"
@@ -236,9 +238,30 @@ export const RegisterCard = ({
               </FormItem>
             )}
           />
-          <Button disabled={isLoading} className="w-full" type="submit">
-            {isLoading && <Loader className="animate-spin text-muted-foreground size-4 mr-3" />}
-            Sign Up
+          <Button
+            effect={"ringHover"}
+            size="sm"
+            disabled={isLoading}
+            className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
+            type="submit"
+            ref={animateRef}
+          >
+            {isLoading && (
+              <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
+            )}
+            {!isLoading && "Sign Up"}
+            {!isLoading && (
+              <svg className="mt-2 text-white/50 -ml-1">
+                <path
+                  fill="currentColor"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
+                ></path>
+              </svg>
+            )}
           </Button>
         </form>
       </Form>

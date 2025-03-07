@@ -44,6 +44,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
 import {
+  ArrowRight,
   Ellipsis,
   Eye,
   EyeOff,
@@ -760,6 +761,7 @@ export const UserButton = ({
                                     <Checkbox
                                       checked={field.value}
                                       onCheckedChange={field.onChange}
+                                      className="data-[state=checked]:bg-blue-500 border-blue-500/40"
                                     />
                                   </FormControl>
                                   <div className="space-y-1 leading-none">
@@ -795,7 +797,7 @@ export const UserButton = ({
                               size={"sm"}
                               type="submit"
                               disabled={isLoading}
-                              className="mt-4"
+                              className="mt-4 bg-blue-500 hover:bg-blue-600"
                             >
                               {isLoading && (
                                 <Loader className="mr-1 size-2 text-muted-foreground animate-spin" />
@@ -1496,7 +1498,7 @@ export const UserButton = ({
                                       variant={"destructive"}
                                       disabled={isLoading}
                                       size={"sm"}
-                                      className="mt-4 mr-2"
+                                      className="mt-4 mr-2 shadow-inner"
                                     >
                                       {isLoading && (
                                         <Loader className="size-2 text-white animate-spin" />
@@ -1516,6 +1518,9 @@ export const UserButton = ({
                       size="sm"
                       // @ts-expect-error Just a simple type error
                       className={cn("text-sm self-start -mt-[4px]", passkeys.data?.length > 0 ? "-ml-3" : "ml-auto")}
+                      effect={"expandIcon"}
+                      icon={ArrowRight}
+                      iconPlacement="right"
                       onClick={onAddPasskey}
                     >
                       Add passkey
@@ -1704,6 +1709,9 @@ export const UserButton = ({
                           variant={"ghost"}
                           size="sm"
                           className={cn("text-sm self-start -mt-[4px]", connections.length > 0 ? "-ml-3" : "ml-auto")}
+                          effect={"expandIcon"}
+                          icon={ArrowRight}
+                          iconPlacement="right"
                         >
                           Add connection
                         </Button>
