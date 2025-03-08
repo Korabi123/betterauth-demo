@@ -5,7 +5,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
-import { twoFactor } from "better-auth/plugins";
+import { multiSession, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 
 const prisma = new PrismaClient();
@@ -67,6 +67,7 @@ export const auth = betterAuth({
       rpID: "localhost",
       rpName: "BetterAuth Demo",
       origin: "http://localhost:3000",
-    })
+    }),
+    multiSession(),
   ],
 });
