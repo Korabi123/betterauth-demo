@@ -454,8 +454,10 @@ export const UserButton = ({
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="p-0 m-0" />
           <DialogTrigger asChild>
-            <DropdownMenuItem disabled={isLoading} className="py-4 group px-6 font-medium text-black/70 cursor-pointer">
-              {/* <Settings className="h-4 w-4" /> */}
+            <DropdownMenuItem
+              disabled={isLoading}
+              className="py-4 group px-6 font-medium text-black/70 cursor-pointer"
+            >
               <svg
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
