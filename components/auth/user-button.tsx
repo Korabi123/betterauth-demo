@@ -497,7 +497,7 @@ export const UserButton = ({
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 16 16"
-                  className="text-zinc-600 group-hover:text-zinc-800 transition-all w-5 h-5"
+                  className="text-zinc-600 group-hover:text-zinc-800 transition-all size-[18px]"
                 >
                   <path
                     fill="currentColor"
