@@ -436,8 +436,8 @@ export const UserButton = ({
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="md:w-96 w-80 rounded-xl shadow-lg p-3">
-          <DropdownMenuLabel>
+        <DropdownMenuContent className="md:w-96 w-80 rounded-xl shadow-lg p-0">
+          <DropdownMenuLabel className="p-3 px-6">
             <div className="flex items-center gap-4">
               <Avatar>
                 {/* @ts-expect-error Just a simple type error */}
@@ -447,30 +447,67 @@ export const UserButton = ({
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs font-medium">{user.email}</p>
+                <p className="text-sm font-[460]">{user.name}</p>
+                <p className="text-xs font-[460]">{user.email}</p>
               </div>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className="p-0 m-0" />
           <DialogTrigger asChild>
-            <DropdownMenuItem className="p-3.5 font-medium text-black/70 cursor-pointer">
-              <Settings className="h-4 w-4" />
+            <DropdownMenuItem disabled={isLoading} className="py-4 group px-6 font-medium text-black/70 cursor-pointer">
+              {/* <Settings className="h-4 w-4" /> */}
+              <svg
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                className="text-zinc-600 group-hover:text-zinc-800 transition-all w-4 h-4"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M6.559 2.536A.667.667 0 0 1 7.212 2h1.574a.667.667 0 0 1 .653.536l.22 1.101c.466.178.9.429 1.287.744l1.065-.36a.667.667 0 0 1 .79.298l.787 1.362a.666.666 0 0 1-.136.834l-.845.742c.079.492.079.994 0 1.486l.845.742a.666.666 0 0 1 .137.833l-.787 1.363a.667.667 0 0 1-.791.298l-1.065-.36c-.386.315-.82.566-1.286.744l-.22 1.101a.666.666 0 0 1-.654.536H7.212a.666.666 0 0 1-.653-.536l-.22-1.101a4.664 4.664 0 0 1-1.287-.744l-1.065.36a.666.666 0 0 1-.79-.298L2.41 10.32a.667.667 0 0 1 .136-.834l.845-.743a4.7 4.7 0 0 1 0-1.485l-.845-.742a.667.667 0 0 1-.137-.833l.787-1.363a.667.667 0 0 1 .791-.298l1.065.36c.387-.315.821-.566 1.287-.744l.22-1.101ZM7.999 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
+                ></path>
+              </svg>
               <span className="ml-2 p-0">Manage Account</span>
             </DropdownMenuItem>
           </DialogTrigger>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className="p-0 m-0" />
           <DropdownMenuItem
             onClick={() => {
-              authClient.signOut({}, {
-                onSuccess: () => {
-                  router.refresh();
-                }
-              });
+              setIsLoading(true);
+              setTimeout(() => {
+                authClient.signOut(
+                  {},
+                  {
+                    onSuccess: () => {
+                      router.refresh();
+                    },
+                  }
+                );
+              }, 1000);
             }}
-            className="p-3.5 font-medium text-black/70 cursor-pointer"
+            onSelect={(e) => e.preventDefault()}
+            disabled={isLoading}
+            className="py-4 px-6 font-medium text-black/70 cursor-pointer"
           >
-            <LogOut className="h-4 w-4" />
+            <span ref={parent}>
+              {!isLoading ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  className="text-zinc-600 group-hover:text-zinc-800 transition-all w-5 h-5"
+                >
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M2.6 2.604A2.045 2.045 0 0 1 4.052 2h3.417c.544 0 1.066.217 1.45.604.385.387.601.911.601 1.458v.69c0 .413-.334.75-.746.75a.748.748 0 0 1-.745-.75v-.69a.564.564 0 0 0-.56-.562H4.051a.558.558 0 0 0-.56.563v7.875a.564.564 0 0 0 .56.562h3.417a.558.558 0 0 0 .56-.563v-.671c0-.415.333-.75.745-.75s.746.335.746.75v.671c0 .548-.216 1.072-.6 1.459a2.045 2.045 0 0 1-1.45.604H4.05a2.045 2.045 0 0 1-1.45-.604A2.068 2.068 0 0 1 2 11.937V4.064c0-.548.216-1.072.6-1.459Zm8.386 3.116a.743.743 0 0 1 1.055 0l1.74 1.75a.753.753 0 0 1 0 1.06l-1.74 1.75a.743.743 0 0 1-1.055 0 .753.753 0 0 1 0-1.06l.467-.47H5.858A.748.748 0 0 1 5.112 8c0-.414.334-.75.746-.75h5.595l-.467-.47a.753.753 0 0 1 0-1.06Z"
+                  ></path>
+                </svg>
+              ) : (
+                <Loader className="mr-1 size-4 text-muted-foreground animate-spin" />
+              )}
+            </span>
             <span className="ml-2 p-0">Sign Out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -1515,8 +1552,11 @@ export const UserButton = ({
                     <Button
                       variant={"ghost"}
                       size="sm"
-                      // @ts-expect-error Just a simple type error
-                      className={cn("text-sm self-start -mt-[4px]", passkeys.data?.length > 0 ? "-ml-3" : "ml-auto")}
+                      className={cn(
+                        "text-sm self-start -mt-[4px]",
+                        // @ts-expect-error Just a simple type error
+                        passkeys.data?.length > 0 ? "-ml-3" : "ml-auto"
+                      )}
                       effect={"expandIcon"}
                       icon={ArrowRight}
                       iconPlacement="right"
@@ -1535,7 +1575,13 @@ export const UserButton = ({
                     ref={thirdParent}
                     className="flex flex-col gap-1 items-end md:w-[350px]"
                   >
-                    {error && <ErrorCard className="w-full -mt-2" size="sm" error={error} />}
+                    {error && (
+                      <ErrorCard
+                        className="w-full -mt-2"
+                        size="sm"
+                        error={error}
+                      />
+                    )}
                     {connections.map((connection) => {
                       // @ts-expect-error Just a simple type error
                       const provider: string = connection.provider;
@@ -1543,7 +1589,11 @@ export const UserButton = ({
                         provider.charAt(0).toUpperCase() + provider.slice(1);
 
                       return (
-                        <div ref={thirdParent} className="min-w-[350px] -mt-1">
+                        <div
+                          key={connection.id}
+                          ref={thirdParent}
+                          className="min-w-[350px] -mt-1"
+                        >
                           <div className="flex items-center gap-4">
                             <div
                               key={connection.id}
@@ -1707,7 +1757,10 @@ export const UserButton = ({
                         <Button
                           variant={"ghost"}
                           size="sm"
-                          className={cn("text-sm self-start -mt-[4px]", connections.length > 0 ? "-ml-3" : "ml-auto")}
+                          className={cn(
+                            "text-sm self-start -mt-[4px]",
+                            connections.length > 0 ? "-ml-3" : "ml-auto"
+                          )}
                           effect={"expandIcon"}
                           icon={ArrowRight}
                           iconPlacement="right"
@@ -1722,14 +1775,17 @@ export const UserButton = ({
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={async () => {
-                            await authClient.linkSocial({
-                              provider: "google",
-                              callbackURL: "/profile",
-                            }, {
-                              onError: (ctx) => {
-                                setError(ctx.error.message);
+                            await authClient.linkSocial(
+                              {
+                                provider: "google",
+                                callbackURL: "/profile",
+                              },
+                              {
+                                onError: (ctx) => {
+                                  setError(ctx.error.message);
+                                },
                               }
-                            });
+                            );
                           }}
                         >
                           <FcGoogle size={18} />
@@ -1739,14 +1795,17 @@ export const UserButton = ({
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={async () => {
-                            await authClient.linkSocial({
-                              provider: "github",
-                              callbackURL: "/profile",
-                            }, {
-                              onError: (ctx) => {
-                                setError(ctx.error.message);
+                            await authClient.linkSocial(
+                              {
+                                provider: "github",
+                                callbackURL: "/profile",
+                              },
+                              {
+                                onError: (ctx) => {
+                                  setError(ctx.error.message);
+                                },
                               }
-                            });
+                            );
                           }}
                         >
                           <FaGithub size={18} />
