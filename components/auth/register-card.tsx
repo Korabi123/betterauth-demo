@@ -136,9 +136,9 @@ export const RegisterCard = ({
               disabled={isLoading}
               onClick={onGithub}
               variant={"outline"}
-              className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
+              className="w-full shadow-sm border-[1.5px] text-zinc-500 hover:text-zinc-500 font-[450]"
               type="button"
-              size="sm"
+              size="xs"
             >
               <span>
                 <FaGithub className="text-black text-lg" />
@@ -149,9 +149,9 @@ export const RegisterCard = ({
               disabled={isLoading}
               onClick={onGoogle}
               variant={"outline"}
-              className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
+              className="w-full shadow-sm border-[1.5px] text-zinc-500 hover:text-zinc-500 font-[450]"
               type="button"
-              size="sm"
+              size="xs"
             >
               <span>
                 <FcGoogle />

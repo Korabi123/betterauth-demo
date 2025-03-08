@@ -1,6 +1,6 @@
 "use client";
 
-import { FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -22,20 +22,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, GithubIcon, Loader } from "lucide-react";
+import { Eye, EyeOff, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ErrorCard } from "./error-card";
 import { AFTER_LOGIN } from "@/routes";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "../ui/input-otp";
+
 import { useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { SplitOTP } from "../ui/split-otp";
+import { useAutoSubmit } from "@/hooks/use-auto-submit";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -191,6 +188,12 @@ export const LoginCard = ({
     );
   };
 
+  useAutoSubmit({
+    trigger: verifyForm.trigger,
+    watch: verifyForm.watch,
+    onSubmit: verifyForm.handleSubmit(onVerifyOtpSubmit),
+  });
+
   const onPasskeyLogin = async () => {
     await authClient.signIn.passkey(
       {},
@@ -233,9 +236,9 @@ export const LoginCard = ({
                   disabled={isLoading}
                   onClick={onGithub}
                   variant={"outline"}
-                  className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
+                  className="w-full shadow-sm border-[1.5px] text-zinc-500 hover:text-zinc-500 font-[450]"
                   type="button"
-                  size={"sm"}
+                  size={"xs"}
                 >
                   <FaGithub className="text-black text-lg" />
                   Github
@@ -244,9 +247,9 @@ export const LoginCard = ({
                   disabled={isLoading}
                   onClick={onGoogle}
                   variant={"outline"}
-                  className="w-full shadow-sm border-[1.5px] text-zinc-500 font-[450]"
+                  className="w-full shadow-sm border-[1.5px] text-zinc-500 hover:text-zinc-500 font-[450]"
                   type="button"
-                  size={"sm"}
+                  size={"xs"}
                 >
                   <FcGoogle className="text-lg" />
                   Google
@@ -363,7 +366,9 @@ export const LoginCard = ({
         </>
       ) : (
         <>
-          {error && <ErrorCard size="sm" error={error} />}
+          <div ref={animateRef}>
+            {error && <ErrorCard size="sm" error={error} />}
+          </div>
           <Form {...verifyForm}>
             <form className="space-y-6 flex flex-col items-center justify-center">
               <FormField
@@ -372,17 +377,12 @@ export const LoginCard = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <InputOTP disabled={isLoading} maxLength={6} {...field}>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSeparator className="mx-1 text-blue-500" />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
+                      {/* @ts-expect-error Just a simple type error */}
+                      <SplitOTP
+                        {...field}
+                        maxLength={6}
+                        disabled={isLoading}
+                      />
                     </FormControl>
                     <FormDescription>
                       Enter the code in your authenticator app.
@@ -393,7 +393,7 @@ export const LoginCard = ({
               />
               <Button
                 effect={"ringHover"}
-                size="sm"
+                size="xs"
                 disabled={isLoading}
                 className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
                 type="button"

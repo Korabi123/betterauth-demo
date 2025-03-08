@@ -1,25 +1,17 @@
 "use client";
 
 import { UserButton } from "@/components/auth/user-button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
-import Link from "next/link";
 
 const ProfilePage = () => {
   const { data } = authClient.useSession();
 
   if (!data) {
     return (
-      <>
-        <Link href="/login">
-          <p>Login</p>
-        </Link>
-      </>
+      <Skeleton className="size-[44px] border-black/60 rounded-full" />
     );
   }
-
-  data?.user.twoFactorEnabled
-
-  console.log(data?.user.name);
 
   return (
     // @ts-expect-error Just a simple type error

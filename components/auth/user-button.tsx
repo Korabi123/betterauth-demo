@@ -761,7 +761,6 @@ export const UserButton = ({
                                     <Checkbox
                                       checked={field.value}
                                       onCheckedChange={field.onChange}
-                                      className="data-[state=checked]:bg-blue-500 border-blue-500/40"
                                     />
                                   </FormControl>
                                   <div className="space-y-1 leading-none">
@@ -797,7 +796,7 @@ export const UserButton = ({
                               size={"sm"}
                               type="submit"
                               disabled={isLoading}
-                              className="mt-4 bg-blue-500 hover:bg-blue-600"
+                              className="mt-4"
                             >
                               {isLoading && (
                                 <Loader className="mr-1 size-2 text-muted-foreground animate-spin" />
