@@ -1449,7 +1449,10 @@ export const UserButton = ({
               </div>
 
               <div className="flex md:w-[72%] flex-col gap-10">
-                <div ref={thirdParent} className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between">
+                <div
+                  ref={thirdParent}
+                  className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between"
+                >
                   <p className="text-sm font-medium">Passkeys</p>
                   <div
                     ref={thirdParent}
@@ -1694,7 +1697,7 @@ export const UserButton = ({
                       className={cn(
                         "text-sm self-start -mt-[4px]",
                         // @ts-expect-error Just a simple type error
-                        passkeys.data?.length > 0 ? "-ml-3" : "ml-auto"
+                        passkeys.data?.length > 0 ? "-ml-3" : "md:ml-auto"
                       )}
                       effect={"expandIcon"}
                       icon={ArrowRight}
@@ -1708,7 +1711,10 @@ export const UserButton = ({
               </div>
 
               <div className="flex md:w-[72%] flex-col gap-10">
-                <div ref={thirdParent} className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between">
+                <div
+                  ref={thirdParent}
+                  className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between"
+                >
                   <p className="text-sm font-medium">Connected Accounts</p>
                   <div
                     ref={thirdParent}
@@ -1897,8 +1903,9 @@ export const UserButton = ({
                           variant={"ghost"}
                           size="sm"
                           className={cn(
-                            "text-sm self-start -mt-[4px]",
-                            connections.length > 0 ? "-ml-3" : "ml-auto"
+                            "text-sm self-start -mt-[7.5px]",
+                            // @ts-expect-error Just a simple type error
+                            passkeys.data?.length > 0 ? "-ml-3" : "md:ml-auto"
                           )}
                           effect={"expandIcon"}
                           icon={ArrowRight}
