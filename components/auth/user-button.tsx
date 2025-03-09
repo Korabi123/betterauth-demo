@@ -430,8 +430,16 @@ export const UserButton = ({
         setIsProfileBoxOpen(false);
         setIsPasswordBoxOpen(false);
         setIsTwoFactorBoxOpen(false);
+        setIsRemoveTwoFactorBoxOpen(false);
+        setIsDeletePasskeyBoxOpen(false);
+        setIsDeleteConnectionBoxOpen("closed");
         setError("");
         form.reset();
+        passwordForm.reset();
+        twoFactorForm.reset();
+        totpCodeForm.reset();
+        removeTwoFactorForm.reset();
+        renamePasskeyForm.reset();
       }}
     >
       <DropdownMenu>
@@ -652,9 +660,9 @@ export const UserButton = ({
         </DialogHeader>
         <Separator className="bg-border/50" />
         <div className="flex flex-col gap-3">
-          <div className="flex py-3 justify-between items-start w-full">
+          <div className="flex md:flex-row flex-col md:gap-0 gap-8 py-3 justify-between items-start w-full">
             <p className="text-sm font-medium pointer-events-none">Profile</p>
-            <div ref={parent} className="w-[65%]">
+            <div ref={parent} className="md:w-[65%] w-full">
               {!isProfileBoxOpen ? (
                 <div className="flex items-center gap-4">
                   <Avatar>
@@ -778,10 +786,10 @@ export const UserButton = ({
 
           <Separator className="h-[2px] bg-border/50" />
 
-          <div className="flex py-3 justify-between items-start w-full">
+          <div className="flex md:flex-row flex-col md:gap-0 gap-8 py-3 w-full">
             <p className="text-sm font-medium pointer-events-none">Security</p>
-            <div className="flex w-full items-end flex-col gap-10">
-              <div className="flex w-[72%] flex-col gap-10">
+            <div className="flex w-full md:items-end flex-col gap-10">
+              <div className="flex md:w-[72%] flex-col gap-10">
                 <div ref={secondParent}>
                   {!isPasswordBoxOpen ? (
                     <div className="flex items-center justify-between">
@@ -979,7 +987,7 @@ export const UserButton = ({
                 </div>
               </div>
 
-              <div className="flex w-[72%] flex-col gap-10">
+              <div className="flex md:w-[72%] flex-col gap-10">
                 <div ref={thirdParent}>
                   {!isTwoFactorBoxOpen && !isRemoveTwoFactorBoxOpen ? (
                     <div className="min-w-[350px]">
@@ -1440,12 +1448,12 @@ export const UserButton = ({
                 </div>
               </div>
 
-              <div className="flex w-[72%] flex-col gap-10">
-                <div ref={thirdParent} className="flex justify-between">
+              <div className="flex md:w-[72%] flex-col gap-10">
+                <div ref={thirdParent} className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between">
                   <p className="text-sm font-medium">Passkeys</p>
                   <div
                     ref={thirdParent}
-                    className="flex flex-col gap-6 items-end md:w-[350px]"
+                    className="flex flex-col gap-6 items-end md:w-[350px] md:ml-0 ml-4"
                   >
                     {passkeys.data && (
                       <>
@@ -1699,12 +1707,12 @@ export const UserButton = ({
                 </div>
               </div>
 
-              <div className="flex w-[72%] flex-col gap-10">
-                <div ref={thirdParent} className="flex justify-between">
+              <div className="flex md:w-[72%] flex-col gap-10">
+                <div ref={thirdParent} className="flex md:flex-row flex-col md:gap-0 gap-8 justify-between">
                   <p className="text-sm font-medium">Connected Accounts</p>
                   <div
                     ref={thirdParent}
-                    className="flex flex-col gap-1 items-end md:w-[350px]"
+                    className="flex flex-col gap-1 md:items-end md:w-[350px] md:ml-0 ml-4"
                   >
                     {error && (
                       <ErrorCard
