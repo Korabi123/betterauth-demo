@@ -40,9 +40,9 @@ export const RecentLoginEmail = ({
       <Body style={main}>
         <Preview>APP_NAME recent login</Preview>
         <Container>
-          <Section style={logo}>
+          {/* <Section style={logo}>
             <Img src="https://react-email-demo-qv38cga5x-resend.vercel.app/static/yelp-logo.png" />
-          </Section>
+          </Section> */}
 
           <Section style={content}>
             <Row>
