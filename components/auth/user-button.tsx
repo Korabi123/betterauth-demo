@@ -136,45 +136,9 @@ export const UserButton = ({
     getConnections();
     getSessions();
   }, []);
-  
+
   if (!user) {
     return "Unauthorized";
-  }
-
-  const onGithubDelete = async () => {
-    setIsLoading(true);
-
-    setTimeout(async () => {
-      await axios
-        .delete("/api/connections/delete/github")
-        .catch((error) => {
-          setError(error.response.data.message);
-          setIsLoading(false);
-        })
-        .finally(() => {
-          setIsLoading(false);
-          setIsDeleteConnectionBoxOpen("closed");
-          window.location.reload();
-        });
-    }, 1000);
-  }
-
-  const onGoogleDelete = async () => {
-    setIsLoading(true);
-
-    setTimeout(async () => {
-      await axios
-        .delete("/api/connections/delete/google")
-        .catch((error) => {
-          setError(error.response.data.message);
-          setIsLoading(false);
-        })
-        .finally(() => {
-          setIsLoading(false);
-          setIsDeleteConnectionBoxOpen("closed");
-          window.location.reload();
-        });
-    })
   }
 
   return (
