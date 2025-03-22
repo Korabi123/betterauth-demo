@@ -26,6 +26,8 @@ export const ConnectionsSection = ({
   const [connections, setConnections] = useState<Account[]>([]);
   const [isDeleteConnectionBoxOpen, setIsDeleteConnectionBoxOpen] = useState<"github" | "google" | "closed">("closed");
 
+  const passkeys = authClient.useListPasskeys();
+
   useEffect(() => {
     const getConnections = async () => {
       await authClient
