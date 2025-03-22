@@ -78,12 +78,6 @@ import { cn } from "@/lib/utils";
 import { FaGithub } from "react-icons/fa";
 import { ProfileSection } from "../helpers/user-button/profile-section";
 
-const newPasswordSchema = z.object({
-  oldPassword: z.string().min(8),
-  newPassword: z.string().min(8),
-  revokeOtherSessions: z.boolean().default(true),
-});
-
 const twoFactorPasswordSchema = z.object({
   currentPassword: z.string().min(8),
 });
@@ -168,15 +162,6 @@ export const UserButton = ({
     getSessions();
   }, []);
 
-  const passwordForm = useForm<z.infer<typeof newPasswordSchema>>({
-    resolver: zodResolver(newPasswordSchema),
-    defaultValues: {
-      oldPassword: "",
-      newPassword: "",
-      revokeOtherSessions: true,
-    },
-  });
-
   const twoFactorForm = useForm<z.infer<typeof twoFactorPasswordSchema>>({
     resolver: zodResolver(twoFactorPasswordSchema),
     defaultValues: {
@@ -208,31 +193,6 @@ export const UserButton = ({
   if (!user) {
     return "Unauthorized";
   }
-
-  const onPasswordSubmit = async (data: z.infer<typeof newPasswordSchema>) => {
-    await authClient.changePassword(
-      {
-        newPassword: data.newPassword,
-        currentPassword: data.oldPassword,
-        revokeOtherSessions: data.revokeOtherSessions,
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-        },
-        onSuccess: () => {
-          setIsLoading(false);
-          setIsPasswordBoxOpen(false);
-          passwordForm.reset();
-        },
-        onError: (ctx) => {
-          console.log(ctx.error.message);
-          setError(ctx.error.message);
-          setIsLoading(false);
-        },
-      }
-    );
-  };
 
   const onTwoFactorPasswordSubmit = async (
     data: z.infer<typeof twoFactorPasswordSchema>
