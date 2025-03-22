@@ -79,17 +79,6 @@ import { FaGithub } from "react-icons/fa";
 import { ProfileSection } from "../helpers/user-button/profile-section";
 import { SecuritySection } from "../helpers/user-button/security/security-section";
 
-const renamePasskeySchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: "Name is required",
-    })
-    .max(25, {
-      message: "Name must be less than 25 characters",
-    }),
-});
-
 export const UserButton = ({
   user,
   session,
@@ -115,7 +104,6 @@ export const UserButton = ({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
   const [totpUri, setTotpUri] = useState("");
-  const passkeys = authClient.useListPasskeys();
 
   const twoFactorBoxBottomRef = useRef<HTMLDivElement>(null);
 
@@ -148,58 +136,10 @@ export const UserButton = ({
     getConnections();
     getSessions();
   }, []);
-
-  const renamePasskeyForm = useForm<z.infer<typeof renamePasskeySchema>>({
-    resolver: zodResolver(renamePasskeySchema),
-    defaultValues: {
-      name: "",
-    },
-  });
-
+  
   if (!user) {
     return "Unauthorized";
   }
-
-  const parsedAgent = UAParser(session?.userAgent?.toString());
-
-  const onAddPasskey = async () => {
-    await authClient.passkey.addPasskey({
-      name: `${parsedAgent.os.name}, ${parsedAgent.browser.name}`,
-    });
-  };
-
-  const onRenamePasskeySubmit = async (
-    data: z.infer<typeof renamePasskeySchema>,
-    id: string
-  ) => {
-    if (data.name.length < 2) {
-      setError("Name is required");
-    };
-
-    await authClient.passkey.updatePasskey(
-      {
-        id,
-        name: data.name,
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-        },
-        onSuccess: () => {
-          setIsLoading(false);
-          setIsRenamePasskeyBoxOpen(false);
-          window.location.reload();
-          setTimeout(() => {
-            toast.success('Successfully renamed');
-          }, 1000);
-        },
-        onError: (ctx) => {
-          setError(ctx.error.message);
-          setIsLoading(false);
-        },
-      }
-    );
-  };
 
   const onGithubDelete = async () => {
     setIsLoading(true);
@@ -247,10 +187,6 @@ export const UserButton = ({
         setIsDeletePasskeyBoxOpen(false);
         setIsDeleteConnectionBoxOpen("closed");
         setError("");
-        twoFactorForm.reset();
-        totpCodeForm.reset();
-        removeTwoFactorForm.reset();
-        renamePasskeyForm.reset();
       }}
     >
       <DropdownMenu>
