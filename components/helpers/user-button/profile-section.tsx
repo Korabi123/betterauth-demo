@@ -36,7 +36,7 @@ export const ProfileSection = ({
   user: User;
   className?: string;
 }) => {
-  const [parent] = useAutoAnimate();
+  const [animate] = useAutoAnimate();
   const [isProfileBoxOpen, setIsProfileBoxOpen] = useState(false);
   const [image, setImage] = useState<string | null | undefined>(user.image);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,7 @@ export const ProfileSection = ({
   return (
     <div className={cn("flex md:flex-row flex-col md:gap-0 gap-8 py-3 justify-between items-start w-full", className)}>
       <p className="text-sm font-medium pointer-events-none">Profile</p>
-      <div ref={parent} className="md:w-[65%] w-full">
+      <div ref={animate} className="md:w-[65%] w-full">
         {!isProfileBoxOpen ? (
           <div className="flex items-center gap-4">
             <Avatar>
