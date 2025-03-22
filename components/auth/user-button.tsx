@@ -86,54 +86,21 @@ export const UserButton = ({
   user: User;
   session: Session;
 }) => {
-  const [image, setImage] = useState<string | null | undefined>(user.image);
   const [isLoading, setIsLoading] = useState(false);
-  const [isProfileBoxOpen, setIsProfileBoxOpen] = useState(false);
-  const [isPasswordBoxOpen, setIsPasswordBoxOpen] = useState(false);
-  const [isTwoFactorBoxOpen, setIsTwoFactorBoxOpen] = useState(false);
-  const [isRemoveTwoFactorBoxOpen, setIsRemoveTwoFactorBoxOpen] =
-    useState(false);
-  const [connections, setConnections] = useState<Account[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [isRenamePasskeyBoxOpen, setIsRenamePasskeyBoxOpen] = useState<string | boolean>(false);
-  const [isDeletePasskeyBoxOpen, setIsDeletePasskeyBoxOpen] = useState<string | boolean>(false);
-  const [isDeleteConnectionBoxOpen, setIsDeleteConnectionBoxOpen] =
-    useState<"google" | "github" | "closed">("closed");
-  const [twoFactorStage, setTwoFactorStage] = useState(1);
-  const [error, setError] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
-  const [totpUri, setTotpUri] = useState("");
 
-  const twoFactorBoxBottomRef = useRef<HTMLDivElement>(null);
-
-  const [parent] = useAutoAnimate();
-  const [secondParent] = useAutoAnimate();
-  const [thirdParent] = useAutoAnimate();
+  const [animate] = useAutoAnimate();
 
   const router = useRouter();
-  const is2FAEnabled = user.twoFactorEnabled;
-
-  const toggleVisibility = () =>
-    setIsPasswordVisible((prevState) => !prevState);
-  const toggleNewVisibility = () =>
-    setIsNewPasswordVisible((prevState) => !prevState);
 
   console.log(sessions);
 
   useEffect(() => {
-    const getConnections = async () => {
-      await authClient
-        .listAccounts()
-        // @ts-expect-error Just a simple type error
-        .then((res) => setConnections(res.data));
-    };
     const getSessions = async () => {
       await authClient.multiSession.listDeviceSessions()
         // @ts-expect-error Just a simple type error
         .then((res) => setSessions(res.data));
     }
-    getConnections();
     getSessions();
   }, []);
 
@@ -144,13 +111,7 @@ export const UserButton = ({
   return (
     <Dialog
       onOpenChange={() => {
-        setIsProfileBoxOpen(false);
-        setIsPasswordBoxOpen(false);
-        setIsTwoFactorBoxOpen(false);
-        setIsRemoveTwoFactorBoxOpen(false);
-        setIsDeletePasskeyBoxOpen(false);
-        setIsDeleteConnectionBoxOpen("closed");
-        setError("");
+        router.refresh();
       }}
     >
       <DropdownMenu>
@@ -229,7 +190,7 @@ export const UserButton = ({
             disabled={isLoading}
             className="py-4 px-6 font-medium text-black/70 cursor-pointer"
           >
-            <span ref={parent}>
+            <span ref={animate}>
               {!isLoading ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -338,7 +299,7 @@ export const UserButton = ({
                 disabled={isLoading}
                 className="py-4 px-6 font-medium text-black/70 cursor-pointer"
               >
-                <span ref={parent}>
+                <span ref={animate}>
                   {!isLoading ? (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
