@@ -1,5 +1,7 @@
 "use client";
 
+import axios from "axios";
+
 import { FaGithub } from "react-icons/fa";
 
 import * as z from "zod";
@@ -102,6 +104,12 @@ export const LoginCard = ({
             setIsLoading(false);
           } else {
             setIsLoading(false);
+            await axios.post("/api/send/email/recent-login", {
+              email: data.email,
+              userAgent: window.navigator.userAgent,
+              name: "Korab",
+              ip,
+            })
             if (redirectParam) {
               router.push(new URL(redirectParam).pathname);
             } else {

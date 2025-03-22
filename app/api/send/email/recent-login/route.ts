@@ -1,5 +1,6 @@
 import RecentLoginEmail from '@/components/emails/recent-login';
 import { ipToLocation } from '@/lib/ip-to-location';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { UAParser } from 'ua-parser-js';
@@ -9,6 +10,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
   try {
     const { email, ip, userAgent, name } = await req.json();
+
+    // const ip = (await headers()).get("x-forwarded-for");
 
     if (!email || !ip || !userAgent || !name) {
       return new NextResponse("Invalid request", { status: 400 });
