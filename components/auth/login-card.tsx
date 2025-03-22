@@ -107,7 +107,6 @@ export const LoginCard = ({
             await axios.post("/api/send/email/recent-login", {
               email: data.email,
               userAgent: window.navigator.userAgent,
-              name: "Korab",
               ip,
             })
             if (redirectParam) {
