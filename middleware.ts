@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSessionCookie } from "better-auth";
+import { getSessionCookie } from "better-auth/cookies";
 import { PUBLIC_ROUTES } from "./routes";
 
 const publicRoutes = PUBLIC_ROUTES;
