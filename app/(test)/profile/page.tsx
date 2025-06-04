@@ -14,7 +14,7 @@ const ProfilePage = () => {
   }
 
   return (
-    // @ts-expect-error Just a simple type error
+    // @ts-ignore
     <UserButton user={data?.user} session={data?.session} />
   );
 }
