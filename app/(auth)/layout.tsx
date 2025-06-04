@@ -1,4 +1,5 @@
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function AuthLayout({
   children,
@@ -16,6 +17,7 @@ export default function AuthLayout({
         flickerChance={0.1}
       />
       {children}
+      <Toaster />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
 import { multiSession, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
+import ResetPasswordEmail from "./components/emails/reset-password";
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -24,7 +25,10 @@ export const auth = betterAuth({
         to: user.email,
         from: 'no-reply@korabimeri.work.gd',
         subject: 'Reset your password',
-        text: `Click here to reset your password: ${url}`,
+        react: ResetPasswordEmail({
+          resetLink: url,
+          userFirstName: user.name,
+        })
       });
     }
   },
