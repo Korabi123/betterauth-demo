@@ -324,7 +324,7 @@ export const UserButton = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DialogContent className="md:min-w-[850px] max-h-[650px] overflow-y-auto w-full">
+      <DialogContent className="md:min-w-[850px] max-h-[650px] overflow-y-auto overflow-x-hidden w-full">
         <DialogHeader>
           <DialogTitle className="text-xl">Account Settings</DialogTitle>
           <DialogDescription className="text-sm">

@@ -35,6 +35,8 @@ import { FcGoogle } from "react-icons/fc";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SplitOTP } from "../ui/split-otp";
 import { useAutoSubmit } from "@/hooks/use-auto-submit";
+import { passkey } from "better-auth/plugins/passkey";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -49,6 +51,10 @@ const verifySchema = z.object({
   }),
 });
 
+const emailConfirmationSchema = z.object({
+  email: z.string().email(),
+});
+
 export const LoginCard = ({
   showSocial = true,
   ip,
@@ -61,6 +67,7 @@ export const LoginCard = ({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [emailState, setEmailState] = useState("");
   const [isVerifyOtpBoxOpen, setIsVerifyOtpBoxOpen] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const params = useSearchParams();
   const redirectParam = params.get("redirect");
 
@@ -81,6 +88,13 @@ export const LoginCard = ({
     resolver: zodResolver(verifySchema),
     defaultValues: {
       otp: "",
+    },
+  });
+
+  const emailConfirmationForm = useForm<z.infer<typeof emailConfirmationSchema>>({
+    resolver: zodResolver(emailConfirmationSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -181,6 +195,11 @@ export const LoginCard = ({
         },
         onSuccess: async () => {
           setIsLoading(false);
+          await axios.post("/api/send/email/recent-login", {
+            email: emailState,
+            userAgent: window.navigator.userAgent,
+            ip,
+          });
           if (redirectParam) {
             router.push(new URL(redirectParam).pathname);
           } else {
@@ -224,6 +243,10 @@ export const LoginCard = ({
     );
   };
 
+  const onResetPassword = async () => {
+    setIsForgotPassword(true);
+  }
+
   const [animateRef] = useAutoAnimate();
 
   return (
@@ -234,7 +257,7 @@ export const LoginCard = ({
       param={redirectParam!}
       ref={animateRef}
     >
-      {!isVerifyOtpBoxOpen ? (
+      {!isVerifyOtpBoxOpen && !isForgotPassword ? (
         <>
           {showSocial && (
             <>
@@ -296,37 +319,54 @@ export const LoginCard = ({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Input
-                          {...field}
-                          autoCorrect="off"
-                          autoComplete="off"
-                          disabled={isLoading}
-                          type={isPasswordVisible ? "text" : "password"}
-                          className="pe-9"
-                        />
-                        <button
-                          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                      <div>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            autoCorrect="off"
+                            autoComplete="off"
+                            disabled={isLoading}
+                            type={isPasswordVisible ? "text" : "password"}
+                            className="pe-9"
+                          />
+                          <button
+                            className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                            type="button"
+                            onClick={toggleVisibility}
+                            aria-label={
+                              isPasswordVisible
+                                ? "Hide password"
+                                : "Show password"
+                            }
+                            aria-pressed={isPasswordVisible}
+                            aria-controls="password"
+                          >
+                            {isPasswordVisible ? (
+                              <EyeOff
+                                size={16}
+                                strokeWidth={2}
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <Eye
+                                size={16}
+                                strokeWidth={2}
+                                aria-hidden="true"
+                              />
+                            )}
+                          </button>
+                        </div>
+                        <Button
                           type="button"
-                          onClick={toggleVisibility}
-                          aria-label={
-                            isPasswordVisible
-                              ? "Hide password"
-                              : "Show password"
-                          }
-                          aria-pressed={isPasswordVisible}
-                          aria-controls="password"
+                          disabled={isLoading}
+                          size={"sm"}
+                          variant={"link"}
+                          className="mt-2 text-xs text-blue-500 after:bg-blue-600 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
+                          onClick={onResetPassword}
+                          effect={"hoverUnderline"}
                         >
-                          {isPasswordVisible ? (
-                            <EyeOff
-                              size={16}
-                              strokeWidth={2}
-                              aria-hidden="true"
-                            />
-                          ) : (
-                            <Eye size={16} strokeWidth={2} aria-hidden="true" />
-                          )}
-                        </button>
+                          Forgot password?
+                        </Button>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -360,6 +400,7 @@ export const LoginCard = ({
               </Button>
               <Button
                 type="button"
+                disabled={isLoading}
                 size={"sm"}
                 variant={"link"}
                 className="mt-2 text-sm self-center text-blue-500 after:bg-blue-600 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
@@ -373,61 +414,166 @@ export const LoginCard = ({
         </>
       ) : (
         <>
-          <div ref={animateRef}>
-            {error && <ErrorCard size="sm" error={error} />}
-          </div>
-          <Form {...verifyForm}>
-            <form className="space-y-6 flex flex-col items-center justify-center">
-              <FormField
-                control={verifyForm.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      {/* @ts-expect-error Just a simple type error */}
-                      <SplitOTP
-                        {...field}
-                        maxLength={6}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the code in your authenticator app.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                effect={"ringHover"}
-                size="xs"
-                disabled={isLoading}
-                className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
-                type="button"
-                ref={animateRef}
-                onClick={() => {
-                  onVerifyOtpSubmit({ otp: verifyForm.getValues().otp });
-                }}
-              >
-                {isLoading && (
-                  <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
-                )}
-                {!isLoading && "Sign In"}
-                {!isLoading && (
-                  <svg className="mt-2 text-white/50 -ml-1">
-                    <path
-                      fill="currentColor"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
-                    ></path>
-                  </svg>
-                )}
-              </Button>
-            </form>
-          </Form>
+          {isVerifyOtpBoxOpen && !isForgotPassword && (
+            <>
+              <div ref={animateRef}>
+                {error && <ErrorCard size="sm" error={error} />}
+              </div>
+              <Form {...verifyForm}>
+                <form className="space-y-6 flex flex-col items-center justify-center">
+                  <FormField
+                    control={verifyForm.control}
+                    name="otp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          {/* @ts-expect-error Just a simple type error */}
+                          <SplitOTP
+                            {...field}
+                            maxLength={6}
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the code in your authenticator app.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    effect={"ringHover"}
+                    size="xs"
+                    disabled={isLoading}
+                    className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
+                    type="button"
+                    ref={animateRef}
+                    onClick={() => {
+                      onVerifyOtpSubmit({ otp: verifyForm.getValues().otp });
+                    }}
+                  >
+                    {isLoading && (
+                      <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
+                    )}
+                    {!isLoading && "Sign In"}
+                    {!isLoading && (
+                      <svg className="mt-2 text-white/50 -ml-1">
+                        <path
+                          fill="currentColor"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
+                        ></path>
+                      </svg>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    size={"sm"}
+                    variant={"link"}
+                    disabled={isLoading}
+                    className="text-sm self-center text-blue-500 after:bg-blue-600 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
+                    onClick={() => {
+                      setIsVerifyOtpBoxOpen(false);
+                      verifyForm.reset();
+                      setError("");
+                    }}
+                    effect={"hoverUnderline"}
+                  >
+                    Back to login
+                  </Button>
+                </form>
+              </Form>
+            </>
+          )}
+          {isForgotPassword && !isVerifyOtpBoxOpen && (
+            <>
+              <div ref={animateRef}>
+                {error && <ErrorCard size="sm" error={error} />}
+              </div>
+              <Form {...emailConfirmationForm}>
+                <form className="space-y-6 flex flex-col">
+                  <FormField
+                    control={emailConfirmationForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} disabled={isLoading} />
+                        </FormControl>
+                        <FormDescription>
+                          Enter your email address to reset your password.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    effect={"ringHover"}
+                    size="xs"
+                    disabled={isLoading}
+                    className="w-full bg-blue-500 hover:bg-blue-600 hover:ring-blue-600 shadow-inner"
+                    type="button"
+                    ref={animateRef}
+                    onClick={async () => {
+                      await authClient.forgetPassword(
+                        {
+                          email: emailConfirmationForm.getValues().email,
+                          redirectTo: "/reset-password",
+                        },
+                        {
+                          onError: (ctx) => {
+                            setError(ctx.error.message);
+                            setIsLoading(false);
+                          },
+                          onSuccess: () => {
+                            setIsLoading(false);
+                            toast.success(
+                              "Password reset link sent. Please check your email."
+                            );
+                          },
+                        }
+                      );
+                    }}
+                  >
+                    {isLoading && (
+                      <Loader className="text-center ml-3 animate-spin text-white size-4 mr-3" />
+                    )}
+                    {!isLoading && "Send reset link"}
+                    {!isLoading && (
+                      <svg className="mt-2 text-white/50 -ml-1">
+                        <path
+                          fill="currentColor"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="m7.25 5-3.5-2.25v4.5L7.25 5Z"
+                        ></path>
+                      </svg>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    size={"sm"}
+                    variant={"link"}
+                    disabled={isLoading}
+                    className="text-sm self-center text-blue-500 after:bg-blue-600 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:border-1 focus-visible:border-ring/20 transition-all"
+                    onClick={() => {
+                      setIsForgotPassword(false);
+                      emailConfirmationForm.reset();
+                      setError("");
+                    }}
+                    effect={"hoverUnderline"}
+                  >
+                    Back to login
+                  </Button>
+                </form>
+              </Form>
+            </>
+          )}
         </>
       )}
     </CardWrapper>
